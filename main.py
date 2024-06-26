@@ -1,5 +1,5 @@
 '''Changing one line of G84 with tapping to many incremental lines with final Z value'''
-def drop_files(file_name:str= 'Nakrętka M11x1', copy_suffix:str= '_x_mod',peek_inc:float= 1.25):
+def drop_files(file_name:str= 'Gwint', copy_suffix:str= '_x_mod',peek_inc:float= 1.25):
     """ This function open nc file and copy its content to new file with given suffix.
     If function find line with G84 code (which mean tapping),
     its split line with Z increment till orginal z_max value.
@@ -42,4 +42,4 @@ def drop_files(file_name:str= 'Nakrętka M11x1', copy_suffix:str= '_x_mod',peek_
             else:
                 copy_file.write(line)
 
-drop_files(file_name='nakretkam11x1', copy_suffix='_MOD', peek_inc=1.75)
+drop_files(file_name='plytka', copy_suffix='_MOD', peek_inc=1.75)
