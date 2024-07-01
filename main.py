@@ -1,6 +1,8 @@
 '''Changing one line of G84 with tapping to many incremental lines with final Z value'''
 
 import tkinter as tk
+import webbrowser
+from tkinter import messagebox
 from tkinterdnd2 import DND_FILES, TkinterDnD
 
 
@@ -25,11 +27,19 @@ def drop_files():
     its split line with Z increment till orginal z_max value.
      """
     try:
+        global result
+        result = float(spinbox_value.get())
+
+    except ValueError:
+            t_box.delete(1.0, tk.END)
+            t_box.insert(tk.END, 'Set increment to number!')
+
+    try:
         copy_suffix: str = '_x_mod'
         copy = path[:-3] + copy_suffix
         if path.endswith('.NC'):
-            with (open(path, 'r',encoding='UTF-8') as org_file,
-                  open(copy + '.nc', 'w',encoding='UTF-8') as copy_file):
+            with (open(path, 'r', encoding='UTF-8') as org_file,
+                  open(copy + '.nc', 'w', encoding='UTF-8') as copy_file):
                 new_list = []
                 for line in org_file:
                     if 'G84' in line:
@@ -42,8 +52,10 @@ def drop_files():
                         while current_z <= z_max:
                             if current_z >= z_max:
                                 break
-
-                            current_z += float(spinbox_value.get())
+                            result = float(spinbox_value.get())
+                            if result <= 0:
+                                result = 0.1
+                            current_z += result
                             if current_z >= z_max:
                                 current_z = z_max
 
@@ -72,27 +84,36 @@ def drop_files():
 
     except NameError as Error:
         t_box.delete(1.0, tk.END)
-        t_box.insert(tk.END, 'Przeciągnij tu Plik NC')
+        t_box.insert(tk.END, '<<Drop File>>')
+
+
+def message():
+    url = 'https://github.com/WGitra?tab=repositories'
+    webbrowser.open_new(url)
 
 
 root = TkinterDnD.Tk()
-root.geometry('660x380')
-root.title('Drop_G84_Split')
-root.attributes('-alpha', 0.89, '-topmost', True)
+root.geometry('720x380')
+root.title('Drop_G84_Split',)
+root.attributes('-alpha', 0.87, '-topmost', True)
 root.update()
-root.resizable(True, True)
+root.resizable(False, False)
 root.iconbitmap("drop_icon.ico")
-root.config(background='light goldenrod yellow')
-t_box = tk.Text(root)
-scrollbar = tk.Scrollbar(root)
-scrollbar.config(command=t_box.yview)
-t_box.config(background='SkyBlue3',yscrollcommand=scrollbar.set,width=50, height=50)
-t_box.drop_target_register(DND_FILES)
-t_box.dnd_bind('<<Drop>>',drop)
+root.config(background='khaki1')
 
-spinbox_value = tk.StringVar(value=1)
+text_frame = tk.Frame(root)
+t_box = tk.Text(text_frame)
+scrollbar = tk.Scrollbar(text_frame)
+
+scrollbar.config(command=t_box.yview)
+t_box.config(background='SkyBlue3', yscrollcommand=scrollbar.set, width=37, font='Havelica, 14')
+t_box.drop_target_register(DND_FILES)
+t_box.dnd_bind('<<Drop>>', drop)
+
+spinbox_value = tk.StringVar(value='1')
 peek_frame = tk.Frame(root)
-peek_label = tk.Label(peek_frame,text='G84 Increment :')
+
+peek_label = tk.Label(peek_frame, text='G84 Increment :', font='Havelica, 15', background='khaki1')
 peek_spinbox = tk.Spinbox(peek_frame,
                           from_=0.1,
                           to=50,
@@ -100,19 +121,28 @@ peek_spinbox = tk.Spinbox(peek_frame,
                           textvariable=spinbox_value,
                           command='',
                           width=10,
-                          background='tan1',
-                          )
+                          background='cyan',
+                          font='Havelica, 15')
 
 button = tk.Button(root)
 button.config(text='Split G84',
-              background='green yellow',
-              command=drop_files)
+              background='SpringGreen',
+              command=drop_files,
+              font='Havelica, 15')
+
+url_button = tk.Button(root)
+url_button.config(text='WGitara_GitHub',
+                   command=message,
+                  background='light slate blue')
+
 # Layout
-t_box.pack(pady=0, fill=tk.Y, side=tk.LEFT,)
+t_box.pack(pady=0, fill=tk.Y, side=tk.LEFT)
 scrollbar.pack(pady=0, fill=tk.Y, side=tk.LEFT)
+text_frame.pack(side=tk.RIGHT)
 peek_frame.pack(pady=20)
 peek_spinbox.pack(padx=0, pady=0, fill='both', side=tk.RIGHT)
 peek_label.pack(padx=0, ipady=0, fill='both', side=tk.RIGHT)
-button.pack(padx=0, pady=20, fill='both')
-
+button.pack(padx=0, pady=120, fill='both')
+url_button.pack(side=tk.LEFT)
+t_box.insert(tk.END, '<<Drop File>>')
 root.mainloop()
