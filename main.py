@@ -86,6 +86,9 @@ def drop_files():
         t_box.delete(1.0, tk.END)
         t_box.insert(tk.END, '<<Drop File>>')
 
+    except FileNotFoundError:
+        pass
+
 
 def message():
     url = 'https://github.com/WGitra?tab=repositories'
@@ -131,8 +134,8 @@ button.config(text='Split G84',
               font='Havelica, 15')
 
 url_button = tk.Button(root)
-url_button.config(text='WGitara_GitHub',
-                   command=message,
+url_button.config(text='WGitra_GitHub',
+                  command=message,
                   background='light slate blue')
 
 # Layout
